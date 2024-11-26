@@ -1,0 +1,31 @@
+﻿@page "/"
+
+<h3>Chuck Norris Joke</h3>
+
+<button class="btn btn-primary" @onclick="GetJoke">Get a new joke</button>
+<p>@Joke</p>
+
+@code {
+    private string Joke { get; set; }
+
+    private async Task GetJoke()
+    {
+        using var client = new HttpClient();
+        var response = await client.GetAsync("http://localhost:5000/joke"); // Replace with your proxy's URL
+
+        if (response.IsSuccessStatusCode)
+        {
+            var joke = await response.Content.ReadFromJsonAsync<JokeResponse>();
+            Joke = joke.Joke;
+        }
+        else
+        {
+            Joke = "Failed to fetch joke";
+        }
+    }
+
+    public class JokeResponse
+    {
+        public string Joke { get; set; }
+    }
+}
